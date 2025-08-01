@@ -1,15 +1,18 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import config from 'src/config';
+import { AppConfigService } from 'src/config/config.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      url:"postgres://neondb_owner:npg_0Q1LNVcmjkep@ep-curly-star-a4rdrgic-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require", 
-      autoLoadEntities: true,
-      synchronize: true, //false - prod
-      ssl: { rejectUnauthorized: false }, 
+    TypeOrmModule.forRootAsync({
+      inject: [AppConfigService],
+      useFactory: (configService: AppConfigService) => ({
+        type: 'postgres',
+        url: configService.databaseUrl,
+        autoLoadEntities: true,
+        synchronize: true,
+        ssl: { rejectUnauthorized: false },
+      }),
     }),
   ],
 })
