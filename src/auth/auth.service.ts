@@ -1,11 +1,10 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable, ConflictException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CreateUserDto } from "src/dto/create-user.dto";
-import { User } from "src/users/user.schema";
+import { User, UserRole } from "src/users/user.schema";
 import { Repository } from "typeorm";
 import * as bcrypt from "bcryptjs";
 import { JwtService } from "@nestjs/jwt";
-import { access } from "fs";
 
 @Injectable()
 export class AuthService{
@@ -17,9 +16,21 @@ export class AuthService{
     ){}
 
     async Register(createUserDto: CreateUserDto): Promise<User>{
+        const existingUser = await this.usersRepository.findOne({ 
+            where: { username: createUserDto.username } 
+        });
+        
+        if (existingUser) {
+            throw new ConflictException('Username is already taken');
+        }
+
         const hashedPassword = await bcrypt.hash(createUserDto.password,10);
-        createUserDto.password = hashedPassword;
-        const user=this.usersRepository.create(createUserDto);
+        
+        const user = this.usersRepository.create({
+            username: createUserDto.username,
+            password: hashedPassword,
+            role: UserRole.USER 
+        });
         
         return this.usersRepository.save(user);        
     }
@@ -27,19 +38,54 @@ export class AuthService{
     async Login(username:string,password:string): Promise<any>{
         const user = await this.usersRepository.findOne({ where : {username}})
         if(!user){
-            throw new Error('Invlaid User Credentials')
+            throw new UnauthorizedException('Invalid User Credentials')
         }
-
         const isMatch = await bcrypt.compare(password,user.password);
         if(!isMatch){
-            throw new Error('Invalid user credentials')
+            throw new UnauthorizedException('Invalid user credentials')
         }
 
-        const payload ={username:user.username, sub:user.id }
+        const payload = {
+            username: user.username, 
+            sub: user.id,
+            role: user.role
+        };
         const token= this.jwtService.sign(payload);
-        return {access_token:token};
+        return {
+            access_token: token,
+            user: {
+                id: user.id,
+                username: user.username,
+                role: user.role
+            }
+        };
+    }
 
+    async checkUsernameAvailability(username: string): Promise<{ available: boolean }> {
+        const existingUser = await this.usersRepository.findOne({ 
+            where: { username } 
+        });
+        
+        return { available: !existingUser };
+    }
+
+    async createAdmin(createUserDto: CreateUserDto): Promise<User> {
+        const existingUser = await this.usersRepository.findOne({ 
+            where: { username: createUserDto.username } 
+        });
+        
+        if (existingUser) {
+            throw new ConflictException('Username is already taken');
         }
 
-
+        const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+        
+        const adminUser = this.usersRepository.create({
+            username: createUserDto.username,
+            password: hashedPassword,
+            role: UserRole.ADMIN
+        });
+        
+        return this.usersRepository.save(adminUser);
+    }
 }

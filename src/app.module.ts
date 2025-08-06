@@ -7,6 +7,7 @@ import { DatabaseModule } from './database/database.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.schema';
 import { AuthModule } from './auth/auth.module';
+import { ForumsModule } from './forums/forums.module';
 
 
 @Module({
@@ -15,7 +16,8 @@ import { AuthModule } from './auth/auth.module';
     DatabaseModule,
     AIModule,
     TypeOrmModule.forFeature([User]),
-    AuthModule
+    AuthModule,
+    ForumsModule,
   ],
   controllers: [AppController ],
   providers: [AppService],

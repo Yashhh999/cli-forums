@@ -8,7 +8,6 @@ export class AIController{
     @UseGuards(AuthGuard('jwt'))
     @Get('string')
    async getPrompt(@Query('prompt') prompt:string){
-      //  const prompt = String(prompt);
         return {result: await this.aiService.generate(prompt)};
     }
 
