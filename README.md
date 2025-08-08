@@ -16,14 +16,24 @@ CLI Forums lets you post questions and get help - all from your command line. Ot
 
 ## Getting Started
 
-### Start the server first:
+### Quick Install
+
+```bash
+wget https://raw.githubusercontent.com/Yashhh999/cli-forums/refs/heads/main/install.sh
+chmod +x install.sh
+./install.sh
+```
+
+### Manual Setup
+
+#### Start the server first:
 ```bash
 cd server
 npm install
 npm start
 ```
 
-### Then set up the terminal app:
+#### Then set up the terminal app:
 ```bash
 cd cli
 npm install
@@ -72,3 +82,4 @@ When you're stuck on a coding problem, just type `forums ai-help` and the AI wil
 3. Create a GitHub issue if something's broken
 
 This is a learning project - feel free to contribute or just play around with it!
+
