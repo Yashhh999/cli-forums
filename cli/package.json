@@ -1,0 +1,32 @@
+{
+  "name": "cli-forums-client",
+  "version": "1.0.0",
+  "description": "CLI client for the Forums app",
+  "main": "dist/index.js",
+  "bin": {
+    "forums": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "dev:watch": "ts-node --watch src/index.ts"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "inquirer": "^9.2.12",
+    "axios": "^1.6.2",
+    "chalk": "^4.1.2",
+    "ora": "^5.4.1",
+    "boxen": "^5.1.2",
+    "table": "^6.8.1",
+    "figlet": "^1.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/inquirer": "^9.0.7",
+    "@types/figlet": "^1.5.8",
+    "typescript": "^5.3.0",
+    "ts-node": "^10.9.1"
+  }
+}

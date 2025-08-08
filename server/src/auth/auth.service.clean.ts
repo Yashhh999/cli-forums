@@ -15,6 +15,25 @@ export class AuthService{
         private jwtService:JwtService,
     ){}
 
+    async seedInitialAdmin(): Promise<void> {
+        const adminExists = await this.usersRepository.findOne({
+            where: { username: 'yash' }
+        });
+
+        if (!adminExists) {
+            const hashedPassword = await bcrypt.hash('yash', 10);
+            const adminUser = this.usersRepository.create({
+                username: 'yash',
+                password: hashedPassword,
+                role: UserRole.ADMIN
+            });
+            await this.usersRepository.save(adminUser);
+            console.log('✅ Initial admin user "yash" created');
+        } else {
+            console.log('ℹ️  Admin user "yash" already exists');
+        }
+    }
+
     async Register(createUserDto: CreateUserDto): Promise<User>{
         const existingUser = await this.usersRepository.findOne({ 
             where: { username: createUserDto.username } 
