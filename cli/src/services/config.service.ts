@@ -33,7 +33,7 @@ export class ConfigService {
 
   private getDefaultConfig(): UserConfig {
     return {
-      baseUrl: process.env.FORUMS_API_URL || 'http://localhost:3000'
+      baseUrl: process.env.FORUMS_API_URL || 'https://cli-forums.onrender.com'
     };
   }
 
