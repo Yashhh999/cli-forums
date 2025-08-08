@@ -175,9 +175,11 @@ export class ForumService {
           validate: (input: string) => input ? true : 'Title is required'
         },
         {
-          type: 'editor',
+          type: 'input',
           name: 'content',
-          message: 'Post content (this will open your default editor):'
+          message: 'Post content (use \\n for line breaks):',
+          validate: (input: string) => input ? true : 'Content is required',
+          transformer: (input: string) => input.replace(/\\n/g, '\n')
         }
       ]);
 
@@ -265,9 +267,11 @@ export class ForumService {
 
     const answers = await inquirer.prompt([
       {
-        type: 'editor',
+        type: 'input',
         name: 'content',
-        message: 'Comment content (this will open your default editor):'
+        message: 'Comment content (use \\n for line breaks):',
+        validate: (input: string) => input ? true : 'Content is required',
+        transformer: (input: string) => input.replace(/\\n/g, '\n')
       }
     ]);
 

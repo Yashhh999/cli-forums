@@ -10,9 +10,10 @@ CLI Forums lets you post questions and get help - all from your command line. Ot
 
 - Login with username/password
 - Different channels for different topics
-- Post questions and comment on answers
+- Post questions and comment on answers (terminal-only input, no external editor)
 - AI can help answer your questions automatically
 - Nice looking terminal interface with colors
+- Multi-line content support using \\n for line breaks
 
 ## Getting Started
 
