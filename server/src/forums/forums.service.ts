@@ -189,5 +189,99 @@ Please provide a helpful solution or advice for this problem.`;
 
     return aiComment;
   }
-}
 
+  async updateChannel(channelId: number, updateChannelDto: CreateChannelDto): Promise<Channel> {
+    const channel = await this.channelRepository.findOne({
+      where: { id: channelId }
+    });
+
+    if (!channel) {
+      throw new NotFoundException(`Channel with ID ${channelId} not found`);
+    }
+
+    const existingChannel = await this.channelRepository.findOne({
+      where: { name: updateChannelDto.name }
+    });
+
+    if (existingChannel && existingChannel.id !== channelId) {
+      throw new ConflictException('Channel name already exists');
+    }
+
+    Object.assign(channel, updateChannelDto);
+    return this.channelRepository.save(channel);
+  }
+
+  async deleteChannel(channelId: number): Promise<{ message: string }> {
+    const channel = await this.channelRepository.findOne({
+      where: { id: channelId },
+      relations: ['posts']
+    });
+
+    if (!channel) {
+      throw new NotFoundException(`Channel with ID ${channelId} not found`);
+    }
+
+    if (channel.posts && channel.posts.length > 0) {
+      throw new ConflictException('Cannot delete channel with existing posts');
+    }
+
+    await this.channelRepository.remove(channel);
+    return { message: 'Channel deleted successfully' };
+  }
+
+  async updatePost(postId: number, updatePostDto: CreatePostDto, userId: number): Promise<Post> {
+    const post = await this.postRepository.findOne({
+      where: { id: postId },
+      relations: ['author']
+    });
+
+    if (!post) {
+      throw new NotFoundException(`Post with ID ${postId} not found`);
+    }
+
+    if (post.author.id !== userId) {
+      throw new ConflictException('You can only update your own posts');
+    }
+
+    post.title = updatePostDto.title;
+    post.content = updatePostDto.content;
+    
+    return this.postRepository.save(post);
+  }
+
+  async deletePost(postId: number, userId: number): Promise<{ message: string }> {
+    const post = await this.postRepository.findOne({
+      where: { id: postId },
+      relations: ['author', 'comments']
+    });
+
+    if (!post) {
+      throw new NotFoundException(`Post with ID ${postId} not found`);
+    }
+
+    if (post.author.id !== userId) {
+      throw new ConflictException('You can only delete your own posts');
+    }
+
+    await this.postRepository.remove(post);
+    return { message: 'Post deleted successfully' };
+  }
+
+  async deleteComment(commentId: number, userId: number): Promise<{ message: string }> {
+    const comment = await this.commentRepository.findOne({
+      where: { id: commentId },
+      relations: ['author']
+    });
+
+    if (!comment) {
+      throw new NotFoundException(`Comment with ID ${commentId} not found`);
+    }
+
+    if (comment.author.id !== userId) {
+      throw new ConflictException('You can only delete your own comments');
+    }
+
+    await this.commentRepository.remove(comment);
+    return { message: 'Comment deleted successfully' };
+  }
+}
